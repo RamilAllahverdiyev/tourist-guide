@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import auth
+from .models import City, Destination, Favorite
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
-    return render(request, 'home.html')
+    cities = City.objects.all()
+    return render(request, 'home.html', {'cities': cities})
 
 
 def room(request):
@@ -52,4 +53,41 @@ def login_page(request):
 
 
 def profile_page(request):
-    return render(request, 'profile.html')
+    user = request.user
+    favorite_destinations = Favorite.objects.filter(user=user).select_related('destination')
+
+    context = {
+        'favorite_destinations': favorite_destinations
+    }
+
+    return render(request, 'profile.html', context)
+
+
+def city_details(request, city_id):
+    city = get_object_or_404(City, id=city_id)
+    destinations = city.destination_set.all()
+    return render(request, 'city_details.html', {'city': city, 'destinations': destinations})
+
+
+def add_to_favorites(request, destination_id):
+    destination = get_object_or_404(Destination, id=destination_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, destination=destination)
+    if created:
+        # New favorite created
+        # You can add additional logic or display a success message here
+        pass
+    else:
+        # Favorite already exists
+        # You can add additional logic or display a message here
+        pass
+    return redirect('city_details', city_id=destination.city.id)
+
+
+def remove_from_favorites(request, destination_id):
+    user = request.user
+    try:
+        favorite = Favorite.objects.get(user=user, destination_id=destination_id)
+        favorite.delete()
+        return redirect('profile')
+    except Favorite.DoesNotExist:
+        return redirect('profile')

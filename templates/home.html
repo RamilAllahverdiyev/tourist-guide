@@ -1,2 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home Page</title>
+  <style>
+    /* Styles for the home page */
 
-<a href="{% url 'profile' %}">Profile</a>
+    /* ... Your CSS styles here ... */
+  </style>
+</head>
+<body>
+  <h1>Welcome to the City Portal</h1>
+
+  <h2>All Cities</h2>
+
+  {% for city in cities %}
+  <div class="city">
+    <h3>{{ city.name }}</h3>
+    <img src="{{ city.photo.url }}" alt="{{ city.name }} Photo">
+    <p>Weather: {{ city.weather }}</p>
+    <a href="{% url 'city_details' city.id %}">View Details</a>
+  </div>
+  {% endfor %}
+</body>
+</html>

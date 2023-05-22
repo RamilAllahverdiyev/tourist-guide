@@ -1,1 +1,33 @@
-<a>Profile</a>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Profile</title>
+  <style>
+    /* Styles for the user profile page */
+
+    /* ... Your CSS styles here ... */
+  </style>
+</head>
+<body>
+  <h1>User Profile</h1>
+
+  <h2>Favorite Destinations</h2>
+
+  {% if favorite_destinations %}
+    {% for favorite in favorite_destinations %}
+    <div class="destination">
+      <h3>{{ favorite.destination.name }}</h3>
+      <img src="{{ favorite.destination.photo.url }}" alt="{{ favorite.destination.name }} Photo">
+      <p>Description: {{ favorite.destination.description }}</p>
+      <p>History: {{ favorite.destination.history }}</p>
+      <form action="{% url 'remove_from_favorites' favorite.destination.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Remove from Favorites">
+      </form>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>No favorite destinations found.</p>
+  {% endif %}
+</body>
+</html>
