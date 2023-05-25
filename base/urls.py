@@ -1,6 +1,10 @@
 from django.urls import path
 from . import views
 
+from django.conf.urls.static import static
+from django.conf import settings
+
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('room/', views.room, name="room"),
@@ -11,3 +15,5 @@ urlpatterns = [
     path('add_to_favorites/<int:destination_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('remove_from_favorites/<int:destination_id>/', views.remove_from_favorites, name='remove_from_favorites'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
