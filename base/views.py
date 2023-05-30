@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from .models import City, Destination, Favorite
 from django.contrib.auth.decorators import login_required
-
+from .forms import SearchForm
+from django.contrib.auth import logout
 
 def home(request):
     cities = City.objects.all()
@@ -91,3 +92,26 @@ def remove_from_favorites(request, destination_id):
         return redirect('profile')
     except Favorite.DoesNotExist:
         return redirect('profile')
+
+
+def search_view(request):
+    form = SearchForm(request.GET)
+    results = []
+
+    if form.is_valid():
+        search_query = form.cleaned_data['search_query']
+        city_results = City.objects.filter(name__icontains=search_query)
+
+        if city_results:
+            city = city_results[0]  # Get the first city that matches the search query
+            results = city.destination_set.all()
+
+    return render(request, 'home.html', {'form': form, 'cities': results})
+
+def help_page(request):
+    return render(request, 'help.html')
+
+def logout_page(request):
+    user = request.user
+    logout(request)
+    return redirect('home', {'user': user})
